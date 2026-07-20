@@ -3,293 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas MI Al-Falah</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <title>Kas Kelas MI Al-Falah</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        .header { background: #007bff; color: white; padding: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 1.2rem; }
+        .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .box { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; }
+        .box span { font-size: 0.8rem; display: block; margin-bottom: 5px;}
+        .box strong { font-size: 1.1rem; }
+        .sisa { grid-column: span 2; background: #28a745; text-align: center; font-size: 1.3rem; padding: 15px;}
+        .info { background: #fff3cd; color: #856404; padding: 10px; margin: 15px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; border: 1px solid #ffeeba;}
+        .container { padding: 0 15px 15px 15px; }
+        .section-title { font-size: 1.1rem; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; }
+        .student { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .name { font-weight: bold; color: #333; font-size: 0.95rem; margin-bottom: 4px; }
+        .marks { color: #28a745; font-size: 0.9rem; }
+        .controls { display: flex; align-items: center; gap: 10px; font-weight: bold;}
+        .btn-control { background: #007bff; color: white; border: none; width: 32px; height: 32px; border-radius: 5px; font-size: 1.2rem; cursor: pointer; display:flex; justify-content:center; align-items:center; }
+        .btn-control:active { background: #0056b3; }
+        .btn-control:disabled { background: #ccc; cursor: not-allowed; }
+        .expense-item { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .add-expense { display: flex; flex-direction: column; gap: 10px; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
+        .add-expense input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;}
+        .add-expense button { background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer;}
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;}
+    </style>
 </head>
-<body class="bg-[#F6F4EE] text-[#233229] min-h-screen pb-16">
-    <!-- Header -->
-    <div class="bg-[#22543D] text-[#F6F4EE] p-5 shadow-md">
-        <div class="text-[11px] tracking-widest uppercase opacity-70 mb-1">Buku Kas · MI Al-Falah</div>
-        <div class="text-xl font-bold flex items-center gap-2">
-            <span>🐖</span> Kas Siswa 2026/2027
-        </div>
-        <div class="text-xs opacity-75 mt-1">37 Siswa · Rp 5.000/bulan · Mulai Juli 2026</div>
-    </div>
+<body>
 
-    <div class="max-w-md mx-auto p-4 space-y-4">
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm col-span-2">
-                <div class="text-xs text-gray-500 mb-1">Sisa Kas / Saldo</div>
-                <div id="totalSaldo" class="text-2xl font-bold text-[#22543D]">Rp 0</div>
-            </div>
-            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">Siswa Lunas (12 bln)</div>
-                <div id="totalLunas" class="text-lg font-bold text-amber-600">0 / 37</div>
-            </div>
-            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm">
-                <div class="text-xs text-gray-500 mb-1">Total Kas Masuk</div>
-                <div id="totalMasukKas" class="text-lg font-bold text-emerald-600">Rp 0</div>
-            </div>
+<div class="header">
+    <h1>Buku Kas MI Al-Falah</h1>
+    <div class="summary">
+        <div class="box">
+            <span>Pemasukan</span>
+            <strong id="pemasukan">Rp 0</strong>
         </div>
-
-        <!-- Info Pembayaran -->
-        <div class="bg-white rounded-xl p-4 border border-[#E7E3D6] text-xs space-y-2">
-            <div class="font-bold text-[#B14A3D] flex items-center gap-1">
-                <span>⏰</span> Paling lambat tanggal 10 tiap bulan
-            </div>
-            <div><strong>Transfer BCA:</strong> 6260316379 (a.n. Nuraeni)</div>
-            <div><strong>Cash:</strong> Mama Adeeva / Mama Fahri / Mama Syakila</div>
+        <div class="box">
+            <span>Pengeluaran</span>
+            <strong id="pengeluaran">Rp 0</strong>
         </div>
-
-        <!-- Tab Navigasi -->
-        <div class="flex gap-2 bg-[#EDEAE0] p-1 rounded-xl">
-            <button onclick="switchTab('siswa')" id="btnTabSiswa" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition">Pembayaran Siswa</button>
-            <button onclick="switchTab('kas')" id="btnTabKas" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition">Buku Pemasukan/Pengeluaran</button>
-        </div>
-
-        <!-- Konten Tab Siswa -->
-        <div id="contentSiswa" class="space-y-3">
-            <input type="text" id="searchStudent" oninput="renderStudents()" placeholder="Cari nama siswa..." class="w-full px-3 py-2 text-xs bg-white border border-[#E7E3D6] rounded-xl outline-none focus:ring-2 focus:ring-[#22543D]">
-            <div id="studentList" class="space-y-2"></div>
-        </div>
-
-        <!-- Konten Tab Kas -->
-        <div id="contentKas" class="space-y-4 hidden">
-            <div class="bg-white p-4 rounded-xl border border-[#E7E3D6] space-y-3">
-                <h3 class="font-bold text-xs text-[#22543D]">Catat Pemasukan / Pengeluaran Baru</h3>
-                <form id="cashForm" onsubmit="addCash(event)" class="space-y-2">
-                    <input type="text" id="cashDesc" placeholder="Keterangan (contoh: Beli spidol)" required class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cashAmount" placeholder="Nominal (Rp)" required class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
-                        <select id="cashType" class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
-                            <option value="in">Pemasukan (+)</option>
-                            <option value="ex">Pengeluaran (-)</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-[#22543D] text-white py-2 rounded-lg text-xs font-bold">Simpan</button>
-                </form>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-[#E7E3D6]">
-                <h3 class="font-bold text-xs text-gray-700 mb-2">Riwayat Kas</h3>
-                <div id="cashList" class="space-y-2 text-xs"></div>
-            </div>
+        <div class="box sisa">
+            <span>Sisa Uang Kas</span>
+            <strong id="sisa">Rp 0</strong>
         </div>
     </div>
+</div>
 
-    <!-- Modal Detail Siswa -->
-    <div id="studentModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 id="modalStudentName" class="font-bold text-base"></h3>
-                <button onclick="closeModal()" class="text-gray-400 font-bold text-lg">✕</button>
-            </div>
-            <div class="text-xs text-gray-500">Klik bulan di bawah untuk mencentang status pembayaran (Rp 5.000/bln):</div>
-            <div id="modalMonthsGrid" class="grid grid-cols-3 gap-2"></div>
-            <button onclick="closeModal()" class="w-full bg-[#22543D] text-white py-2 rounded-xl text-xs font-bold">Tutup & Simpan</button>
-        </div>
+<div class="info">
+    <strong>📋 Note: Paling lambat tgl 10/bulan</strong><br>
+    - Transfer: BCA 6260316379 (a.n NURAENI)<br>
+    - Cash: Ke Mama Adeeva / Mama Fahri / Mama Syakila
+</div>
+
+<div class="container">
+    <div class="section-title">Daftar Siswa (Rp 5.000/bln)</div>
+    <div id="student-list"></div>
+
+    <div class="section-title">Pengeluaran</div>
+    <div id="expense-list"></div>
+
+    <div class="add-expense">
+        <strong>Tambah Pengeluaran Baru</strong>
+        <input type="text" id="exp-name" placeholder="Nama Barang (Contoh: Sapu)">
+        <input type="number" id="exp-amount" placeholder="Nominal (Contoh: 15000)">
+        <button onclick="addExpense()">Tambah Pengeluaran</button>
     </div>
+</div>
 
-    <script>
-        const MONTHS = ["Jul '26", "Ags '26", "Sep '26", "Okt '26", "Nov '26", "Des '26", "Jan '27", "Feb '27", "Mar '27", "Apr '27", "Mei '27", "Jun '27"];
-        
-        const defaultNames = [
-            ["Adeeva Khairunnisa", 1], ["Afifah Cahya R.", 4], ["Agam Abdilah", 0],
-            ["Alfarizki Akbar", 0], ["Alika Nayla Putri", 12], ["Azizah Aurelia Oktavia", 1],
-            ["Cintya Rizki Azilla", 0], ["Clarissa Naomi Alifa", 3], ["Eka Candra Dinata", 4],
-            ["Faizah Azzahra", 1], ["Fifi Zaina Khairun", 0], ["Hanif Waldan", 2],
-            ["Hijrah Kasih Hajar", 0], ["Ihsan Rambu Rabani", 0], ["Irfan Rahmadani", 2],
-            ["Kania Nasya Razita", 2], ["Keira Afsheen D.", 2], ["Mikaila Agustin C.", 1],
-            ["Mozza Caesar", 0], ["M. Fahri Nurdiyansyah", 1], ["M. Jundi Sultan A.", 0],
-            ["M. Luthfi Al Ghifari", 2], ["Muhammad Naufal", 1], ["M. Omar Pramuja", 0],
-            ["M. Rizky Ramadhan", 2], ["Naura Firdaus", 7], ["Nazril Septianto", 1],
-            ["Nurwan", 0], ["Omar Syaban", 1], ["Qalista Ayudia", 4],
-            ["Radhika Raffa Putra", 12], ["Raisha Adinda Qirani", 2], ["Rizki Raditya Putra", 1],
-            ["Syakila Aiza Putri Arief", 2], ["Zulfah Nur Arsyila", 2], ["Azka Azfar Rahmadan", 1],
-            ["Nazwan Alfarizi", 1]
+<script>
+    const KAS_PER_BULAN = 5000;
+    
+    // Inisialisasi Data
+    let students = JSON.parse(localStorage.getItem('kas_alfalah_students'));
+    let expenses = JSON.parse(localStorage.getItem('kas_alfalah_expenses'));
+
+    if (!students) {
+        students = [
+            { name: "Adeeva Khairunnisa", months: 1 }, { name: "Afifah Cahya. R", months: 4 },
+            { name: "Agam Abdilah", months: 0 }, { name: "Alfarizki Akbar", months: 0 },
+            { name: "Alika Nayla Putri", months: 12 }, { name: "Azizah Aurelia Oktavia", months: 1 },
+            { name: "Cintya Rizki Azilla", months: 0 }, { name: "Clarissa Naomi Alifa", months: 3 },
+            { name: "Eka Candra Dinata", months: 4 }, { name: "Faizah Azzahra", months: 1 },
+            { name: "Fifi Zaina Khairun", months: 0 }, { name: "Hanif Waldan", months: 2 },
+            { name: "Hijrah Kasih Hajar", months: 0 }, { name: "Ihsan Rambu Rabani", months: 0 },
+            { name: "Irfan Rahmadani", months: 2 }, { name: "Kania Nasya Razita", months: 2 },
+            { name: "Keira Afsheen. D", months: 2 }, { name: "Mikaila Agustin. C", months: 1 },
+            { name: "Mozza Caesar", months: 0 }, { name: "M. Fahri Nurdiyansyah", months: 1 },
+            { name: "M. Jundi Sultan. A", months: 0 }, { name: "M. Luthfi Al Ghifari", months: 2 },
+            { name: "Muhammad Naufal", months: 1 }, { name: "M. Omar Pramuja", months: 0 },
+            { name: "M. Rizky Ramadhan", months: 2 }, { name: "Naura Firdaus", months: 7 },
+            { name: "Nazril Septianto", months: 1 }, { name: "Nurwan", months: 0 },
+            { name: "Omar Syaban", months: 1 }, { name: "Qalista Ayudia", months: 4 },
+            { name: "Radhika Raffa Putra", months: 12 }, { name: "Raisha Adinda Qirani", months: 2 },
+            { name: "Rizki Raditya Putra", months: 1 }, { name: "Syakila Aiza Putri Arief", months: 2 },
+            { name: "Zulfah Nur Arsyila", months: 2 }, { name: "Azka Azfar Rahmadan", months: 1 },
+            { name: "Nazwan Alfarizi", months: 1 }
         ];
+    }
+    
+    if (!expenses) {
+        expenses = [
+            { name: "Kain pel, serbet, ember, tissu", amount: 85000 },
+            { name: "Hand wash", amount: 8900 },
+            { name: "Buku kas + fotocopy", amount: 25000 }
+        ];
+    }
 
-        let appData = JSON.parse(localStorage.getItem('kas_alfalah_v3')) || {
-            students: defaultNames.map(([name, paid], i) => ({
-                id: `s${i+1}`,
-                name: name,
-                months: MONTHS.map((_, idx) => idx < paid)
-            })),
-            incomes: [{ id: 'in1', desc: 'Setoran kas siswa (awal)', amount: 310000 }],
-            expenses: [
-                { id: 'ex1', desc: 'Kain pel, serbet, ember, tisu', amount: 85000 },
-                { id: 'ex2', desc: 'Hand wash', amount: 8900 },
-                { id: 'ex3', desc: 'Buku kas + fotocopy', amount: 25000 }
-            ]
-        };
+    function saveData() {
+        localStorage.setItem('kas_alfalah_students', JSON.stringify(students));
+        localStorage.setItem('kas_alfalah_expenses', JSON.stringify(expenses));
+        render();
+    }
 
-        let activeStudentId = null;
+    function getMarks(months) {
+        if (months === 12) return '❤️ Lunas (12 bln)';
+        if (months === 0) return 'Belum membayar';
+        return '✅'.repeat(months);
+    }
 
-        function saveData() {
-            localStorage.setItem('kas_alfalah_v3', JSON.stringify(appData));
-            renderAll();
-        }
+    function render() {
+        let totalPemasukan = students.reduce((sum, s) => sum + (s.months * KAS_PER_BULAN), 0);
+        let totalPengeluaran = expenses.reduce((sum, e) => sum + e.amount, 0);
+        let sisaKas = totalPemasukan - totalPengeluaran;
 
-        function formatRupiah(num) {
-            return "Rp " + Number(num).toLocaleString("id-ID");
-        }
+        document.getElementById('pemasukan').innerText = 'Rp ' + totalPemasukan.toLocaleString('id-ID');
+        document.getElementById('pengeluaran').innerText = 'Rp ' + totalPengeluaran.toLocaleString('id-ID');
+        document.getElementById('sisa').innerText = 'Rp ' + sisaKas.toLocaleString('id-ID');
 
-        function renderAll() {
-            renderStudents();
-            renderCash();
-            renderSummary();
-        }
+        const studentList = document.getElementById('student-list');
+        studentList.innerHTML = '';
+        students.forEach((s, index) => {
+            studentList.innerHTML += `
+                <div class="student">
+                    <div style="flex: 1;">
+                        <div class="name">${index + 1}. ${s.name}</div>
+                        <div class="marks">${getMarks(s.months)}</div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-control" onclick="updateMonth(${index}, -1)" ${s.months === 0 ? 'disabled' : ''}>-</button>
+                        <span style="width: 15px; text-align: center;">${s.months}</span>
+                        <button class="btn-control" onclick="updateMonth(${index}, 1)" ${s.months === 12 ? 'disabled' : ''}>+</button>
+                    </div>
+                </div>
+            `;
+        });
 
-        function renderSummary() {
-            const totalIncomes = appData.incomes.reduce((a, b) => a + Number(b.amount), 0);
-            const totalExpenses = appData.expenses.reduce((a, b) => a + Number(b.amount), 0);
-            const balance = totalIncomes - totalExpenses;
-            const lunasCount = appData.students.filter(s => s.months.every(Boolean)).length;
-
-            document.getElementById('totalSaldo').innerText = formatRupiah(balance);
-            document.getElementById('totalLunas').innerText = `${lunasCount} / ${appData.students.length}`;
-            document.getElementById('totalMasukKas').innerText = formatRupiah(totalIncomes);
-        }
-
-        function renderStudents() {
-            const query = document.getElementById('searchStudent').value.toLowerCase();
-            const container = document.getElementById('studentList');
-            container.innerHTML = '';
-
-            appData.students
-                .filter(s => s.name.toLowerCase().includes(query))
-                .forEach((s, idx) => {
-                    const paidCount = s.months.filter(Boolean).length;
-                    const isLunas = paidCount === 12;
-                    
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-3 bg-white rounded-xl border border-[#E7E3D6] shadow-sm cursor-pointer';
-                    div.onclick = () => openModal(s.id);
-                    div.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 rounded-full bg-[#EFF6F1] text-[#22543D] flex items-center justify-center text-xs font-bold">${idx + 1}</div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">${s.name}</div>
-                                <div class="text-[11px] text-gray-500">${isLunas ? '❤️ Lunas 12 Bulan' : `✅ ${paidCount} / 12 Bulan`}</div>
-                            </div>
-                        </div>
-                        <div class="text-xs font-bold text-[#22543D] bg-gray-50 px-2 py-1 rounded border">Atur →</div>
-                    `;
-                    container.appendChild(div);
-                });
-        }
-
-        function openModal(id) {
-            activeStudentId = id;
-            const student = appData.students.find(s => s.id === id);
-            document.getElementById('modalStudentName').innerText = student.name;
-            
-            const grid = document.getElementById('modalMonthsGrid');
-            grid.innerHTML = '';
-            
-            MONTHS.forEach((m, idx) => {
-                const isPaid = student.months[idx];
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = `p-2.5 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 border transition ${isPaid ? 'bg-[#22543D] text-white border-[#22543D]' : 'bg-gray-50 text-gray-700 border-gray-200'}`;
-                btn.innerHTML = `<span>${isPaid ? '✓' : '○'}</span><span>${m}</span>`;
-                btn.onclick = () => {
-                    student.months[idx] = !student.months[idx];
-                    saveData();
-                    openModal(id);
-                };
-                grid.appendChild(btn);
-            });
-
-            document.getElementById('studentModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('studentModal').classList.add('hidden');
-            activeStudentId = null;
-        }
-
-        function switchTab(tab) {
-            const btnSiswa = document.getElementById('btnTabSiswa');
-            const btnKas = document.getElementById('btnTabKas');
-            const contentSiswa = document.getElementById('contentSiswa');
-            const contentKas = document.getElementById('contentKas');
-
-            if (tab === 'siswa') {
-                btnSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition";
-                btnKas.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition";
-                contentSiswa.classList.remove('hidden');
-                contentKas.classList.add('hidden');
-            } else {
-                btnKas.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition";
-                btnSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition";
-                contentKas.classList.remove('hidden');
-                contentSiswa.classList.add('hidden');
-            }
-        }
-
-        function addCash(e) {
-            e.preventDefault();
-            const desc = document.getElementById('cashDesc').value;
-            const amount = parseFloat(document.getElementById('cashAmount').value);
-            const type = document.getElementById('cashType').value;
-
-            const item = { id: 'c' + Date.now(), desc, amount };
-            if (type === 'in') {
-                appData.incomes.push(item);
-            } else {
-                appData.expenses.push(item);
-            }
-
-            document.getElementById('cashDesc').value = '';
-            document.getElementById('cashAmount').value = '';
-            saveData();
-        }
-
-        function deleteCash(type, id) {
-            if (type === 'in') {
-                appData.incomes = appData.incomes.filter(i => i.id !== id);
-            } else {
-                appData.expenses = appData.expenses.filter(e => e.id !== id);
-            }
-            saveData();
-        }
-
-        function renderCash() {
-            const container = document.getElementById('cashList');
-            container.innerHTML = '';
-
-            const allEntries = [
-                ...appData.incomes.map(i => ({ ...i, type: 'in', labelColor: 'text-emerald-600' })),
-                ...appData.expenses.map(e => ({ ...e, type: 'ex', labelColor: 'text-rose-600' }))
-            ];
-
-            if (allEntries.length === 0) {
-                container.innerHTML = '<div class="text-gray-400 text-center py-2">Belum ada riwayat kas.</div>';
-                return;
-            }
-
-            allEntries.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border';
-                div.innerHTML = `
+        const expenseList = document.getElementById('expense-list');
+        expenseList.innerHTML = '';
+        expenses.forEach((e, index) => {
+            expenseList.innerHTML += `
+                <div class="expense-item">
                     <div>
-                        <div class="font-bold">${item.desc}</div>
-                        <div class="text-[10px] text-gray-400">${item.type === 'in' ? 'Pemasukan' : 'Pengeluaran'}</div>
+                        <strong>${e.name}</strong><br>
+                        <small style="color: #e74c3c; font-weight: bold;">Rp ${e.amount.toLocaleString('id-ID')}</small>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold ${item.labelColor}">${item.type === 'in' ? '+' : '-'}${formatRupiah(item.amount)}</span>
-                        <button onclick="deleteCash('${item.type}', '${item.id}')" class="text-red-400 font-bold px-1">✕</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
+                    <button class="btn-delete" onclick="deleteExpense(${index})">X</button>
+                </div>
+            `;
+        });
+    }
 
-        renderAll();
-    </script>
+    function updateMonth(index, change) {
+        if(students[index].months + change >= 0 && students[index].months + change <= 12) {
+            students[index].months += change;
+            saveData();
+        }
+    }
+
+    function addExpense() {
+        const name = document.getElementById('exp-name').value;
+        const amount = parseInt(document.getElementById('exp-amount').value);
+        if (name && amount > 0) {
+            expenses.push({ name, amount });
+            document.getElementById('exp-name').value = '';
+            document.getElementById('exp-amount').value = '';
+            saveData();
+        } else {
+            alert('Pastikan nama barang dan nominal diisi dengan benar!');
+        }
+    }
+
+    function deleteExpense(index) {
+        if(confirm('Yakin ingin menghapus pengeluaran ini?')) {
+            expenses.splice(index, 1);
+            saveData();
+        }
+    }
+
+    render();
+</script>
 </body>
-  </html>
-  
+</html>
