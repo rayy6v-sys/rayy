@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kas MI Al-Falah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F4EE] text-[#233229] min-h-screen pb-12">
+    <!-- Header -->
+    <div class="bg-[#22543D] text-[#F6F4EE] p-5">
+        <div class="text-[11px] tracking-widest uppercase opacity-70 mb-1">Buku Kas · MI Al-Falah</div>
+        <div class="text-xl font-bold">Kas Siswa 2026/2027</div>
+        <div class="text-xs opacity-75 mt-1">37 Siswa · Rp 5.000/bulan</div>
+    </div>
+
+    <div class="max-w-md mx-auto p-4 space-y-4">
+        <!-- Info Pembayaran -->
+        <div class="bg-white rounded-xl p-4 border border-[#E7E3D6] text-xs space-y-2">
+            <div class="font-bold text-[#B14A3D]">⚠️ Paling lambat tanggal 10 tiap bulan</div>
+            <div><strong>Transfer BCA:</strong> 6260316379 (a.n. Nuraeni)</div>
+            <div><strong>Cash:</strong> Mama Adeeva / Mama Fahri / Mama Syakila</div>
+        </div>
+
+        <!-- Daftar Siswa -->
+        <div class="bg-white rounded-xl p-4 border border-[#E7E3D6]">
+            <h2 class="font-bold text-sm mb-3 text-[#22543D]">Daftar Pembayaran Siswa</h2>
+            <div id="studentList" class="space-y-2">
+                <!-- Data siswa akan diisi oleh script -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const studentsData = [
+            ["Adeeva Khairunnisa", 1], ["Afifah Cahya R.", 4], ["Agam Abdilah", 0],
+            ["Alfarizki Akbar", 0], ["Alika Nayla Putri", 12], ["Azizah Aurelia Oktavia", 1],
+            ["Cintya Rizki Azilla", 0], ["Clarissa Naomi Alifa", 3], ["Eka Candra Dinata", 4],
+            ["Faizah Azzahra", 1], ["Fifi Zaina Khairun", 0], ["Hanif Waldan", 2],
+            ["Hijrah Kasih Hajar", 0], ["Ihsan Rambu Rabani", 0], ["Irfan Rahmadani", 2],
+            ["Kania Nasya Razita", 2], ["Keira Afsheen D.", 2], ["Mikaila Agustin C.", 1],
+            ["Mozza Caesar", 0], ["M. Fahri Nurdiyansyah", 1], ["M. Jundi Sultan A.", 0],
+            ["M. Luthfi Al Ghifari", 2], ["Muhammad Naufal", 1], ["M. Omar Pramuja", 0],
+            ["M. Rizky Ramadhan", 2], ["Naura Firdaus", 7], ["Nazril Septianto", 1],
+            ["Nurwan", 0], ["Omar Syaban", 1], ["Qalista Ayudia", 4],
+            ["Radhika Raffa Putra", 12], ["Raisha Adinda Qirani", 2], ["Rizki Raditya Putra", 1],
+            ["Syakila Aiza Putri Arief", 2], ["Zulfah Nur Arsyila", 2], ["Azka Azfar Rahmadan", 1],
+            ["Nazwan Alfarizi", 1]
+        ];
+
+        function renderStudents() {
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
+            
+            studentsData.forEach(([name, paid], idx) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2.5 bg-[#FBFAF6] rounded-lg border border-[#E7E3D6] text-xs';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 text-center text-gray-400 font-bold">${idx + 1}</span>
+                        <span class="font-semibold text-slate-800">${name}</span>
+                    </div>
+                    <span class="px-2 py-1 rounded bg-emerald-100 text-emerald-800 font-medium">
+                        ${paid} / 12 Bulan
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        renderStudents();
+    </script>
+</body>
+          </html>
+          
