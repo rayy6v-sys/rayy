@@ -1,479 +1,295 @@
-import { useState, useEffect, useMemo } from "react";
-import { Check, X, Plus, Trash2, Search, Wallet, Users, ArrowDownCircle, ArrowUpCircle, ChevronRight, PiggyBank, Landmark, Banknote, Copy, CalendarClock } from "lucide-react";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kas MI Al-Falah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#F6F4EE] text-[#233229] min-h-screen pb-16">
+    <!-- Header -->
+    <div class="bg-[#22543D] text-[#F6F4EE] p-5 shadow-md">
+        <div class="text-[11px] tracking-widest uppercase opacity-70 mb-1">Buku Kas · MI Al-Falah</div>
+        <div class="text-xl font-bold flex items-center gap-2">
+            <span>🐖</span> Kas Siswa 2026/2027
+        </div>
+        <div class="text-xs opacity-75 mt-1">37 Siswa · Rp 5.000/bulan · Mulai Juli 2026</div>
+    </div>
 
-const MONTHS = [
-  { label: "Jul", year: "26" },
-  { label: "Ags", year: "26" },
-  { label: "Sep", year: "26" },
-  { label: "Okt", year: "26" },
-  { label: "Nov", year: "26" },
-  { label: "Des", year: "26" },
-  { label: "Jan", year: "27" },
-  { label: "Feb", year: "27" },
-  { label: "Mar", year: "27" },
-  { label: "Apr", year: "27" },
-  { label: "Mei", year: "27" },
-  { label: "Jun", year: "27" },
-];
+    <div class="max-w-md mx-auto p-4 space-y-4">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm col-span-2">
+                <div class="text-xs text-gray-500 mb-1">Sisa Kas / Saldo</div>
+                <div id="totalSaldo" class="text-2xl font-bold text-[#22543D]">Rp 0</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm">
+                <div class="text-xs text-gray-500 mb-1">Siswa Lunas (12 bln)</div>
+                <div id="totalLunas" class="text-lg font-bold text-amber-600">0 / 37</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-[#E7E3D6] shadow-sm">
+                <div class="text-xs text-gray-500 mb-1">Total Kas Masuk</div>
+                <div id="totalMasukKas" class="text-lg font-bold text-emerald-600">Rp 0</div>
+            </div>
+        </div>
 
-const KAS_PER_BULAN = 5000;
-const STORAGE_KEY = "kas-al-falah-v1";
+        <!-- Info Pembayaran -->
+        <div class="bg-white rounded-xl p-4 border border-[#E7E3D6] text-xs space-y-2">
+            <div class="font-bold text-[#B14A3D] flex items-center gap-1">
+                <span>⏰</span> Paling lambat tanggal 10 tiap bulan
+            </div>
+            <div><strong>Transfer BCA:</strong> 6260316379 (a.n. Nuraeni)</div>
+            <div><strong>Cash:</strong> Mama Adeeva / Mama Fahri / Mama Syakila</div>
+        </div>
 
-const NAMES_WITH_PAID = [
-  ["Adeeva Khairunnisa", 1],
-  ["Afifah Cahya R.", 4],
-  ["Agam Abdilah", 0],
-  ["Alfarizki Akbar", 0],
-  ["Alika Nayla Putri", 12],
-  ["Azizah Aurelia Oktavia", 1],
-  ["Cintya Rizki Azilla", 0],
-  ["Clarissa Naomi Alifa", 3],
-  ["Eka Candra Dinata", 4],
-  ["Faizah Azzahra", 1],
-  ["Fifi Zaina Khairun", 0],
-  ["Hanif Waldan", 2],
-  ["Hijrah Kasih Hajar", 0],
-  ["Ihsan Rambu Rabani", 0],
-  ["Irfan Rahmadani", 2],
-  ["Kania Nasya Razita", 2],
-  ["Keira Afsheen D.", 2],
-  ["Mikaila Agustin C.", 1],
-  ["Mozza Caesar", 0],
-  ["M. Fahri Nurdiyansyah", 1],
-  ["M. Jundi Sultan A.", 0],
-  ["M. Luthfi Al Ghifari", 2],
-  ["Muhammad Naufal", 1],
-  ["M. Omar Pramuja", 0],
-  ["M. Rizky Ramadhan", 2],
-  ["Naura Firdaus", 7],
-  ["Nazril Septianto", 1],
-  ["Nurwan", 0],
-  ["Omar Syaban", 1],
-  ["Qalista Ayudia", 4],
-  ["Radhika Raffa Putra", 12],
-  ["Raisha Adinda Qirani", 2],
-  ["Rizki Raditya Putra", 1],
-  ["Syakila Aiza Putri Arief", 2],
-  ["Zulfah Nur Arsyila", 2],
-  ["Azka Azfar Rahmadan", 1],
-  ["Nazwan Alfarizi", 1],
-];
+        <!-- Tab Navigasi -->
+        <div class="flex gap-2 bg-[#EDEAE0] p-1 rounded-xl">
+            <button onclick="switchTab('siswa')" id="btnTabSiswa" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition">Pembayaran Siswa</button>
+            <button onclick="switchTab('kas')" id="btnTabKas" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition">Buku Pemasukan/Pengeluaran</button>
+        </div>
 
-function defaultData() {
-  return {
-    students: NAMES_WITH_PAID.map(([name, paid], i) => ({
-      id: `s${i + 1}`,
-      name,
-      months: MONTHS.map((_, idx) => idx < paid),
-    })),
-    incomes: [
-      { id: "in1", desc: "Setoran kas siswa (awal)", amount: 310000, note: "" },
-    ],
-    expenses: [
-      { id: "ex1", desc: "Kain pel, serbet, ember, tisu", amount: 85000, note: "" },
-      { id: "ex2", desc: "Hand wash", amount: 8900, note: "" },
-      { id: "ex3", desc: "Buku kas + fotocopy", amount: 25000, note: "" },
-    ],
-  };
-}
+        <!-- Konten Tab Siswa -->
+        <div id="contentSiswa" class="space-y-3">
+            <input type="text" id="searchStudent" oninput="renderStudents()" placeholder="Cari nama siswa..." class="w-full px-3 py-2 text-xs bg-white border border-[#E7E3D6] rounded-xl outline-none focus:ring-2 focus:ring-[#22543D]">
+            <div id="studentList" class="space-y-2"></div>
+        </div>
 
-function formatRupiah(n) {
-  return "Rp " + Math.round(n).toLocaleString("id-ID");
-}
+        <!-- Konten Tab Kas -->
+        <div id="contentKas" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-xl border border-[#E7E3D6] space-y-3">
+                <h3 class="font-bold text-xs text-[#22543D]">Catat Pemasukan / Pengeluaran Baru</h3>
+                <form id="cashForm" onsubmit="addCash(event)" class="space-y-2">
+                    <input type="text" id="cashDesc" placeholder="Keterangan (contoh: Beli spidol)" required class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="cashAmount" placeholder="Nominal (Rp)" required class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
+                        <select id="cashType" class="w-full px-3 py-2 text-xs border rounded-lg outline-none">
+                            <option value="in">Pemasukan (+)</option>
+                            <option value="ex">Pengeluaran (-)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-[#22543D] text-white py-2 rounded-lg text-xs font-bold">Simpan</button>
+                </form>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-[#E7E3D6]">
+                <h3 class="font-bold text-xs text-gray-700 mb-2">Riwayat Kas</h3>
+                <div id="cashList" class="space-y-2 text-xs"></div>
+            </div>
+        </div>
+    </div>
 
-export default function App() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("siswa");
-  const [query, setQuery] = useState("");
-  const [openStudent, setOpenStudent] = useState(null);
-  const [showAddIncome, setShowAddIncome] = useState(false);
-  const [showAddExpense, setShowAddExpense] = useState(false);
-  const [formDesc, setFormDesc] = useState("");
-  const [formAmount, setFormAmount] = useState("");
-  const [saveError, setSaveError] = useState(false);
+    <!-- Modal Detail Siswa -->
+    <div id="studentModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 id="modalStudentName" class="font-bold text-base"></h3>
+                <button onclick="closeModal()" class="text-gray-400 font-bold text-lg">✕</button>
+            </div>
+            <div class="text-xs text-gray-500">Klik bulan di bawah untuk mencentang status pembayaran (Rp 5.000/bln):</div>
+            <div id="modalMonthsGrid" class="grid grid-cols-3 gap-2"></div>
+            <button onclick="closeModal()" class="w-full bg-[#22543D] text-white py-2 rounded-xl text-xs font-bold">Tutup & Simpan</button>
+        </div>
+    </div>
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await window.storage.get(STORAGE_KEY, false);
-        if (res && res.value) {
-          setData(JSON.parse(res.value));
-        } else {
-          const d = defaultData();
-          setData(d);
-          await window.storage.set(STORAGE_KEY, JSON.stringify(d), false);
+    <script>
+        const MONTHS = ["Jul '26", "Ags '26", "Sep '26", "Okt '26", "Nov '26", "Des '26", "Jan '27", "Feb '27", "Mar '27", "Apr '27", "Mei '27", "Jun '27"];
+        
+        const defaultNames = [
+            ["Adeeva Khairunnisa", 1], ["Afifah Cahya R.", 4], ["Agam Abdilah", 0],
+            ["Alfarizki Akbar", 0], ["Alika Nayla Putri", 12], ["Azizah Aurelia Oktavia", 1],
+            ["Cintya Rizki Azilla", 0], ["Clarissa Naomi Alifa", 3], ["Eka Candra Dinata", 4],
+            ["Faizah Azzahra", 1], ["Fifi Zaina Khairun", 0], ["Hanif Waldan", 2],
+            ["Hijrah Kasih Hajar", 0], ["Ihsan Rambu Rabani", 0], ["Irfan Rahmadani", 2],
+            ["Kania Nasya Razita", 2], ["Keira Afsheen D.", 2], ["Mikaila Agustin C.", 1],
+            ["Mozza Caesar", 0], ["M. Fahri Nurdiyansyah", 1], ["M. Jundi Sultan A.", 0],
+            ["M. Luthfi Al Ghifari", 2], ["Muhammad Naufal", 1], ["M. Omar Pramuja", 0],
+            ["M. Rizky Ramadhan", 2], ["Naura Firdaus", 7], ["Nazril Septianto", 1],
+            ["Nurwan", 0], ["Omar Syaban", 1], ["Qalista Ayudia", 4],
+            ["Radhika Raffa Putra", 12], ["Raisha Adinda Qirani", 2], ["Rizki Raditya Putra", 1],
+            ["Syakila Aiza Putri Arief", 2], ["Zulfah Nur Arsyila", 2], ["Azka Azfar Rahmadan", 1],
+            ["Nazwan Alfarizi", 1]
+        ];
+
+        let appData = JSON.parse(localStorage.getItem('kas_alfalah_v3')) || {
+            students: defaultNames.map(([name, paid], i) => ({
+                id: `s${i+1}`,
+                name: name,
+                months: MONTHS.map((_, idx) => idx < paid)
+            })),
+            incomes: [{ id: 'in1', desc: 'Setoran kas siswa (awal)', amount: 310000 }],
+            expenses: [
+                { id: 'ex1', desc: 'Kain pel, serbet, ember, tisu', amount: 85000 },
+                { id: 'ex2', desc: 'Hand wash', amount: 8900 },
+                { id: 'ex3', desc: 'Buku kas + fotocopy', amount: 25000 }
+            ]
+        };
+
+        let activeStudentId = null;
+
+        function saveData() {
+            localStorage.setItem('kas_alfalah_v3', JSON.stringify(appData));
+            renderAll();
         }
-      } catch (e) {
-        const d = defaultData();
-        setData(d);
-        try {
-          await window.storage.set(STORAGE_KEY, JSON.stringify(d), false);
-        } catch (e2) {}
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
-  async function persist(next) {
-    setData(next);
-    try {
-      const res = await window.storage.set(STORAGE_KEY, JSON.stringify(next), false);
-      if (!res) setSaveError(true);
-      else setSaveError(false);
-    } catch (e) {
-      setSaveError(true);
-    }
-  }
+        function formatRupiah(num) {
+            return "Rp " + Number(num).toLocaleString("id-ID");
+        }
 
-  function toggleMonth(studentId, monthIdx) {
-    const next = {
-      ...data,
-      students: data.students.map((s) =>
-        s.id === studentId
-          ? { ...s, months: s.months.map((m, i) => (i === monthIdx ? !m : m)) }
-          : s
-      ),
-    };
-    persist(next);
-  }
+        function renderAll() {
+            renderStudents();
+            renderCash();
+            renderSummary();
+        }
 
-  function addEntry(type) {
-    const amt = parseFloat(formAmount.replace(/[^0-9]/g, ""));
-    if (!formDesc.trim() || !amt || amt <= 0) return;
-    const entry = { id: `${type}${Date.now()}`, desc: formDesc.trim(), amount: amt, note: "" };
-    const key = type === "in" ? "incomes" : "expenses";
-    const next = { ...data, [key]: [...data[key], entry] };
-    persist(next);
-    setFormDesc("");
-    setFormAmount("");
-    setShowAddIncome(false);
-    setShowAddExpense(false);
-  }
+        function renderSummary() {
+            const totalIncomes = appData.incomes.reduce((a, b) => a + Number(b.amount), 0);
+            const totalExpenses = appData.expenses.reduce((a, b) => a + Number(b.amount), 0);
+            const balance = totalIncomes - totalExpenses;
+            const lunasCount = appData.students.filter(s => s.months.every(Boolean)).length;
 
-  function deleteEntry(type, id) {
-    const key = type === "in" ? "incomes" : "expenses";
-    const next = { ...data, [key]: data[key].filter((e) => e.id !== id) };
-    persist(next);
-  }
+            document.getElementById('totalSaldo').innerText = formatRupiah(balance);
+            document.getElementById('totalLunas').innerText = `${lunasCount} / ${appData.students.length}`;
+            document.getElementById('totalMasukKas').innerText = formatRupiah(totalIncomes);
+        }
 
-  const totals = useMemo(() => {
-    if (!data) return { income: 0, expense: 0, balance: 0, lunas: 0, totalMonthsPaid: 0 };
-    const income = data.incomes.reduce((a, b) => a + b.amount, 0);
-    const expense = data.expenses.reduce((a, b) => a + b.amount, 0);
-    const lunas = data.students.filter((s) => s.months.every(Boolean)).length;
-    const totalMonthsPaid = data.students.reduce((a, s) => a + s.months.filter(Boolean).length, 0);
-    return { income, expense, balance: income - expense, lunas, totalMonthsPaid };
-  }, [data]);
+        function renderStudents() {
+            const query = document.getElementById('searchStudent').value.toLowerCase();
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
 
-  const filteredStudents = useMemo(() => {
-    if (!data) return [];
-    if (!query.trim()) return data.students;
-    const q = query.toLowerCase();
-    return data.students.filter((s) => s.name.toLowerCase().includes(q));
-  }, [data, query]);
-        if (loading || !data) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F6F4EE", fontFamily: "system-ui" }}>
-        <div style={{ color: "#3A6B52", fontSize: 14 }}>Memuat data kas…</div>
-      </div>
-    );
-  }
+            appData.students
+                .filter(s => s.name.toLowerCase().includes(query))
+                .forEach((s, idx) => {
+                    const paidCount = s.months.filter(Boolean).length;
+                    const isLunas = paidCount === 12;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 bg-white rounded-xl border border-[#E7E3D6] shadow-sm cursor-pointer';
+                    div.onclick = () => openModal(s.id);
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-[#EFF6F1] text-[#22543D] flex items-center justify-center text-xs font-bold">${idx + 1}</div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-800">${s.name}</div>
+                                <div class="text-[11px] text-gray-500">${isLunas ? '❤️ Lunas 12 Bulan' : `✅ ${paidCount} / 12 Bulan`}</div>
+                            </div>
+                        </div>
+                        <div class="text-xs font-bold text-[#22543D] bg-gray-50 px-2 py-1 rounded border">Atur →</div>
+                    `;
+                    container.appendChild(div);
+                });
+        }
 
-  const openStudentData = openStudent ? data.students.find((s) => s.id === openStudent) : null;
+        function openModal(id) {
+            activeStudentId = id;
+            const student = appData.students.find(s => s.id === id);
+            document.getElementById('modalStudentName').innerText = student.name;
+            
+            const grid = document.getElementById('modalMonthsGrid');
+            grid.innerHTML = '';
+            
+            MONTHS.forEach((m, idx) => {
+                const isPaid = student.months[idx];
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `p-2.5 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1 border transition ${isPaid ? 'bg-[#22543D] text-white border-[#22543D]' : 'bg-gray-50 text-gray-700 border-gray-200'}`;
+                btn.innerHTML = `<span>${isPaid ? '✓' : '○'}</span><span>${m}</span>`;
+                btn.onclick = () => {
+                    student.months[idx] = !student.months[idx];
+                    saveData();
+                    openModal(id);
+                };
+                grid.appendChild(btn);
+            });
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#F6F4EE",
-        fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
-        color: "#233229",
-        paddingBottom: 32,
-      }}
-    >
-      {/* Header */}
-      <div style={{ background: "#22543D", color: "#F6F4EE", padding: "22px 18px 26px" }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", opacity: 0.7, marginBottom: 4 }}>
-          Buku Kas · MI Al-Falah
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
-          <PiggyBank size={22} /> Kas Siswa 2026/2027
-        </div>
-        <div style={{ fontSize: 12.5, opacity: 0.75, marginTop: 4 }}>
-          {data.students.length} siswa · Rp {KAS_PER_BULAN.toLocaleString("id-ID")}/bulan · mulai Juli 2026
-        </div>
-      </div>
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
 
-      {/* Summary cards */}
-      <div style={{ padding: "0 14px", marginTop: -16 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <SummaryCard label="Sisa Kas" value={formatRupiah(totals.balance)} accent="#22543D" big />
-          <SummaryCard label="Siswa Lunas" value={`${totals.lunas} / ${data.students.length}`} accent="#B8860B" />
-          <SummaryCard label="Pemasukan" value={formatRupiah(totals.income)} accent="#2E7D4F" icon={<ArrowUpCircle size={14} />} />
-          <SummaryCard label="Pengeluaran" value={formatRupiah(totals.expense)} accent="#B14A3D" icon={<ArrowDownCircle size={14} />} />
-        </div>
-      </div>
+        function closeModal() {
+            document.getElementById('studentModal').classList.add('hidden');
+            activeStudentId = null;
+        }
 
-      {saveError && (
-        <div style={{ margin: "10px 14px 0", padding: "8px 12px", background: "#FCE8E6", color: "#9A3B2E", borderRadius: 8, fontSize: 12.5 }}>
-          Gagal menyimpan perubahan. Coba lagi.
-        </div>
-      )}
+        function switchTab(tab) {
+            const btnSiswa = document.getElementById('btnTabSiswa');
+            const btnKas = document.getElementById('btnTabKas');
+            const contentSiswa = document.getElementById('contentSiswa');
+            const contentKas = document.getElementById('contentKas');
 
-      {/* Payment info */}
-      <div style={{ padding: "14px 14px 0" }}>
-        <PaymentInfo />
-      </div>
+            if (tab === 'siswa') {
+                btnSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition";
+                btnKas.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition";
+                contentSiswa.classList.remove('hidden');
+                contentKas.classList.add('hidden');
+            } else {
+                btnKas.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-[#22543D] text-white transition";
+                btnSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 transition";
+                contentKas.classList.remove('hidden');
+                contentSiswa.classList.add('hidden');
+            }
+        }
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, padding: "18px 14px 10px" }}>
-        <TabButton active={tab === "siswa"} onClick={() => setTab("siswa")} icon={<Users size={15} />} label="Pembayaran" />
-        <TabButton active={tab === "kas"} onClick={() => setTab("kas")} icon={<Wallet size={15} />} label="Buku Kas" />
-      </div>
+        function addCash(e) {
+            e.preventDefault();
+            const desc = document.getElementById('cashDesc').value;
+            const amount = parseFloat(document.getElementById('cashAmount').value);
+            const type = document.getElementById('cashType').value;
 
-      {tab === "siswa" && (
-        <div style={{ padding: "0 14px" }}>
-          <div style={{ position: "relative", marginBottom: 12 }}>
-            <Search size={15} style={{ position: "absolute", left: 12, top: 11, color: "#8A9A8F" }} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari nama siswa…"
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: "10px 12px 10px 34px",
-                borderRadius: 10,
-                border: "1px solid #DDD8CB",
-                background: "#fff",
-                fontSize: 14,
-                outline: "none",
-              }}
-            />
-          </div>
+            const item = { id: 'c' + Date.now(), desc, amount };
+            if (type === 'in') {
+                appData.incomes.push(item);
+            } else {
+                appData.expenses.push(item);
+            }
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {filteredStudents.map((s, idx) => {
-              const paidCount = s.months.filter(Boolean).length;
-              const isLunas = paidCount === 12;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setOpenStudent(s.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    background: "#fff",
-                    border: "1px solid #E7E3D6",
-                    borderRadius: 12,
-                    padding: "10px 12px",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      background: "#EFF6F1",
-                      color: "#22543D",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      flexShrink: 0,
-                    }}
-                  >        border: "none",
-        background: active ? "#22543D" : "#EDEAE0",
-        color: active ? "#fff" : "#5B6B5E",
-        fontWeight: 600,
-        fontSize: 13.5,
-        cursor: "pointer",
-        fontFamily: "inherit",
-      }}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
+            document.getElementById('cashDesc').value = '';
+            document.getElementById('cashAmount').value = '';
+            saveData();
+        }
 
-function MiniProgress({ paid }) {
-  const pct = (paid / 12) * 100;
-  return (
-    <div style={{ width: 34, height: 5, background: "#EDEAE0", borderRadius: 3, flexShrink: 0, overflow: "hidden" }}>
-      <div style={{ width: `${pct}%`, height: "100%", background: paid === 12 ? "#B8860B" : "#22543D" }} />
-    </div>
-  );
-}
+        function deleteCash(type, id) {
+            if (type === 'in') {
+                appData.incomes = appData.incomes.filter(i => i.id !== id);
+            } else {
+                appData.expenses = appData.expenses.filter(e => e.id !== id);
+            }
+            saveData();
+        }
 
-function KasSection({ title, color, icon, entries, onAdd, onDelete }) {
-  const total = entries.reduce((a, b) => a + b.amount, 0);
-  return (
-    <div style={{ marginBottom: 18 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, color, fontWeight: 700, fontSize: 14.5 }}>
-          {icon} {title}
-        </div>
-        <button
-          onClick={onAdd}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            background: color,
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            padding: "6px 10px",
-            fontSize: 12.5,
-            fontWeight: 600,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        ><Plus size={14} /> Tambah
-        </button>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {entries.map((e) => (
-          <div
-            key={e.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              background: "#fff",
-              border: "1px solid #E7E3D6",
-              borderRadius: 10,
-              padding: "9px 11px",
-            }}
-          >
-            <div style={{ flex: 1, fontSize: 13.5 }}>{e.desc}</div>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color }}>{formatRupiah(e.amount)}</div>
-            <button
-              onClick={() => onDelete(e.id)}
-              style={{ border: "none", background: "transparent", cursor: "pointer", color: "#B7BFB2", padding: 2 }}
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
-        ))}
-        {entries.length === 0 && (
-          <div style={{ fontSize: 12.5, color: "#8A9A8F", padding: "8px 2px" }}>Belum ada catatan.</div>
-        )}
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 13, fontWeight: 700, padding: "0 2px" }}>
-        <span style={{ color: "#7C8A7F", fontWeight: 500 }}>Total {title.toLowerCase()}</span>
-        <span style={{ color }}>{formatRupiah(total)}</span>
-      </div>
-    </div>
-  );
-}
+        function renderCash() {
+            const container = document.getElementById('cashList');
+            container.innerHTML = '';
 
-function EntryForm({ title, desc, amount, setDesc, setAmount, onSubmit, color }) {
-  return (
-    <div>
-      <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 14 }}>{title}</div>
-      <label style={{ fontSize: 12.5, color: "#7C8A7F", display: "block", marginBottom: 4 }}>Keterangan</label>
-      <input
-        autoFocus
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
-        placeholder="mis. Beli spidol"
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          padding: "10px 12px",
-          borderRadius: 9,
-          border: "1px solid #DDD8CB",
-          fontSize: 14,
-          marginBottom: 12,
-          outline: "none",
-          fontFamily: "inherit",
-        }}
-      />
-      <label style={{ fontSize: 12.5, color: "#7C8A7F", display: "block", marginBottom: 4 }}>Jumlah (Rp)</label>
-      <input
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder="mis. 25000"
-        inputMode="numeric"
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          padding: "10px 12px",
-          borderRadius: 9,
-          border: "1px solid #DDD8CB",
-          fontSize: 14,
-          marginBottom: 16,
-          outline: "none",
-          fontFamily: "inherit",
-        }}
-      />
-      <button
-        onClick={onSubmit}
-        style={{
-          width: "100%",
-          padding: "11px 0",
-          borderRadius: 10,
-          border: "none",
-          background: color,
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 14,
-          cursor: "pointer",
-          fontFamily: "inherit",
-        }}
-      >
-        Simpan
-      </button>
-    </div>
-  );
-}
+            const allEntries = [
+                ...appData.incomes.map(i => ({ ...i, type: 'in', labelColor: 'text-emerald-600' })),
+                ...appData.expenses.map(e => ({ ...e, type: 'ex', labelColor: 'text-rose-600' }))
+            ];
 
-function Modal({ children, onClose }) {
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(20,30,24,0.45)",
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "center",
-        zIndex: 50,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "#fff",
-          borderRadius: "18px 18px 0 0",
-          padding: "18px 18px 26px",
-          width: "100%",
-          maxWidth: 480,
-          maxHeight: "82vh",
-          overflowY: "auto",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: -8 }}>
-          <button
-            onClick={onClose}
-            style={{ border: "none", background: "#F1EFE6", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-          >
-            <X size={15} color="#5B6B5E" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
+            if (allEntries.length === 0) {
+                container.innerHTML = '<div class="text-gray-400 text-center py-2">Belum ada riwayat kas.</div>';
+                return;
+            }
+
+            allEntries.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border';
+                div.innerHTML = `
+                    <div>
+                        <div class="font-bold">${item.desc}</div>
+                        <div class="text-[10px] text-gray-400">${item.type === 'in' ? 'Pemasukan' : 'Pengeluaran'}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${item.labelColor}">${item.type === 'in' ? '+' : '-'}${formatRupiah(item.amount)}</span>
+                        <button onclick="deleteCash('${item.type}', '${item.id}')" class="text-red-400 font-bold px-1">✕</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        renderAll();
+    </script>
+</body>
+  </html>
+  
